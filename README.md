@@ -3,21 +3,15 @@
 ## Project Overview
 This project is a full-stack web application developed for **CSCI426 – Web Programming (Phase 2)**.
 
-The application includes:
-- A **Next.js frontend**
-- A **Node.js + Express backend**
-- A **MySQL database**
-- **JWT authentication**
-- An **admin-only inbox** with full CRUD functionality
-
-Users can sign up, log in, and submit messages through a contact form.  
-Admins can securely view, update, and delete messages from a protected inbox.
+The system includes a modern frontend built with **Next.js**, a secure backend built with **Node.js and Express**, and a **MySQL** database. The application supports user authentication and an **admin-only inbox** for managing messages submitted through a contact form.
 
 ---
 
 ## Tech Stack
+
 ### Frontend
-- Next.js (React)
+- Next.js
+- React
 - TypeScript
 - Tailwind CSS
 
@@ -25,8 +19,8 @@ Admins can securely view, update, and delete messages from a protected inbox.
 - Node.js
 - Express.js
 - JWT Authentication
-- Zod (validation)
 - bcrypt (password hashing)
+- Zod (request validation)
 
 ### Database
 - MySQL (XAMPP / phpMyAdmin)
@@ -34,12 +28,12 @@ Admins can securely view, update, and delete messages from a protected inbox.
 ---
 
 ## Features
-- User signup & login
-- Password hashing with bcrypt
+- User signup and login
+- Secure password hashing
 - JWT-based authentication
 - Protected backend routes
-- Admin-only inbox (read / update / delete messages)
 - Contact form that stores messages in the database
+- Admin-only inbox with full CRUD functionality
 - Environment-based configuration
 - Clean GitHub repository (no secrets or build files)
 
@@ -47,19 +41,19 @@ Admins can securely view, update, and delete messages from a protected inbox.
 
 ## Project Structure
 /
-├── backend/ # Express backend
+├── backend/
 │ ├── server.js
 │ ├── package.json
 │ └── .env.example
 │
 ├── database/
-│ └── schema.sql # Database schema
+│ └── schema.sql
 │
-├── src/ # Next.js frontend source
+├── src/
 ├── public/
 ├── markdown/Blog/
 │
-├── .env.example # Frontend env example
+├── .env.example
 ├── .gitignore
 ├── package.json
 └── README.md
@@ -76,7 +70,11 @@ NEXTAUTH_SECRET=your-secret-key-here
 NEXT_PUBLIC_API_BASE=http://localhost:4000
 
 
-Author
+-----
 
-Ali Mk
-CSCI426 – Web Programming
+
+
+
+## Author
+**Ali Mk**  
+CSCI426 – Web Programming  
