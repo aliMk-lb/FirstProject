@@ -7,45 +7,54 @@ import Logo from "@/components/Layout/Header/Logo"
 import { useContext, useState } from "react";
 import Loader from "@/components/Common/Loader";
 import AuthDialogContext from "@/app/context/AuthDialogContext";
+import { API_BASE } from "@/utils/api";
 const SignUp = ({signUpOpen}:{signUpOpen?:any}) => {
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const authDialog = useContext(AuthDialogContext);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setLoading(true);
-    const data = new FormData(e.currentTarget);
-    const value = Object.fromEntries(data.entries());
-    const finalData = { ...value };
+    setSuccessMsg("");
+    setErrorMsg("");
 
-    fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(finalData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        toast.success("Successfully registered");
-        setLoading(false);
-        router.push("/");
-      })
-      .catch((err) => {
-        toast.error(err.message);
-        setLoading(false);
+    try {
+      const response = await fetch(`${API_BASE}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
       });
-      setTimeout(() => {
-        signUpOpen(false);
-      }, 1200);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Signup failed");
+      }
+
+      setSuccessMsg("Successfully registered. Redirecting to Sign In...");
+      toast.success("Successfully registered");
       authDialog?.setIsUserRegistered(true);
 
       setTimeout(() => {
         authDialog?.setIsUserRegistered(false);
-      }, 1100);
-
+        signUpOpen(false);
+        router.push("/");
+      }, 1500);
+    } catch (err: any) {
+      const message = err?.message || "Signup failed";
+      setErrorMsg(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,38 +77,46 @@ const SignUp = ({signUpOpen}:{signUpOpen?:any}) => {
           <input
             type="text"
             placeholder="Name"
-            name="name"
-            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+            required
           />
         </div>
         <div className="mb-[22px]">
           <input
             type="email"
             placeholder="Email"
-            name="email"
-            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+            required
           />
         </div>
         <div className="mb-[22px]">
           <input
             type="password"
             placeholder="Password"
-            name="password"
-            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+            required
           />
         </div>
         <div className="mb-9">
           <button
             type="submit"
             className="flex w-full cursor-pointer items-center justify-center rounded-md bg-primary px-5 py-3 text-base text-white transition duration-300 ease-in-out hover:bg-darkprimary! dark:hover:bg-darkprimary!"
+            disabled={loading}
           >
             Sign Up {loading && <Loader />}
           </button>
         </div>
       </form>
+      {successMsg && (
+        <p className="text-green-500 text-sm mb-4">{successMsg}</p>
+      )}
+      {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
 
       <p className="text-body-secondary mb-4 text-base">
         By creating an account you are agree with our{" "}

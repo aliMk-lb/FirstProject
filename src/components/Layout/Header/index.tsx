@@ -23,6 +23,8 @@ const Header: React.FC = () => {
   const [sticky, setSticky] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
+  const [userName, setUserName] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
   const navbarRef = useRef<HTMLDivElement>(null)
   const signInRef = useRef<HTMLDivElement>(null)
@@ -74,6 +76,65 @@ const Header: React.FC = () => {
     }
   }, [isSignInOpen, isSignUpOpen, navbarOpen])
 
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user')
+      if (!storedUser) {
+        setUserName(null)
+        setUserEmail(null)
+        return
+      }
+      const parsed = JSON.parse(storedUser)
+      if (parsed?.name) {
+        setUserName(parsed.name)
+        setUserEmail(parsed.email || null)
+      } else if (parsed?.email) {
+        setUserName(parsed.email)
+        setUserEmail(parsed.email)
+      } else {
+        setUserName(null)
+        setUserEmail(null)
+      }
+    } catch (error) {
+      console.error('Failed to parse user from localStorage', error)
+      setUserName(null)
+      setUserEmail(null)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    window.location.href = '/'
+  }
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'user') {
+        const value = event.newValue
+        if (!value) {
+          setUserName(null)
+          setUserEmail(null)
+          return
+        }
+        try {
+          const parsed = JSON.parse(value)
+          setUserName(parsed?.name || parsed?.email || null)
+          setUserEmail(parsed?.email || null)
+        } catch (e) {
+          setUserName(null)
+          setUserEmail(null)
+        }
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
+  const adminEmail = 'PUT_ADMIN_EMAIL_HERE'
+  const isAdmin =
+    (userEmail || '').trim().toLowerCase() === adminEmail.trim().toLowerCase()
+
   const authDialog = useContext(AuthDialogContext)
 
   return (
@@ -113,60 +174,86 @@ const Header: React.FC = () => {
               <path d='M16.6111 15.855C17.591 15.1394 18.3151 14.1979 18.7723 13.1623C16.4824 13.4065 14.1342 12.4631 12.6795 10.4711C11.2248 8.47905 11.0409 5.95516 11.9705 3.84818C10.8449 3.9685 9.72768 4.37162 8.74781 5.08719C5.7759 7.25747 5.12529 11.4308 7.29558 14.4028C9.46586 17.3747 13.6392 18.0253 16.6111 15.855Z' />
             </svg>
           </button>
-          <Link
-            href='#'
-            className='hidden lg:block bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'
-            onClick={() => {
-              setIsSignInOpen(true)
-            }}>
-            Sign In
-          </Link>
-          {isSignInOpen && (
-            <div
-              ref={signInRef}
-              className='fixed top-0 m-0! left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
-              <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white px-8 py-14 text-center dark:bg-darklight'>
-                <button
-                  onClick={() => setIsSignInOpen(false)}
-                  className=' hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8'
-                  aria-label='Close Sign In Modal'>
-                  <Icon
-                    icon='ic:round-close'
-                    className='text-2xl dark:text-white'
-                  />
-                </button>
-                <Signin
-                  signInOpen={(value: boolean) => setIsSignInOpen(value)}
-                />
-              </div>
-            </div>
-          )}
-          <Link
-            href='#'
-            className='hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'
-            onClick={() => {
-              setIsSignUpOpen(true)
-            }}>
-            Sign Up
-          </Link>
-          {isSignUpOpen && (
-            <div
-              ref={signUpRef}
-              className='fixed top-0 m-0! left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
-              <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white px-8 py-14 text-center dark:bg-darklight'>
-                <button
-                  onClick={() => setIsSignUpOpen(false)}
-                  className=' hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8'
-                  aria-label='Close Sign In Modal'>
-                  <Icon
-                    icon='ic:round-close'
-                    className='text-2xl dark:text-white'
-                  />
-                </button>
-                <SignUp
-                  signUpOpen={(value: boolean) => setIsSignUpOpen(value)}
-                />
-              </div>
+          {!userName ? (
+            <>
+              <Link
+                href='#'
+                className='hidden lg:block bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'
+                onClick={() => {
+                  setIsSignInOpen(true)
+                }}>
+                Sign In
+              </Link>
+              {isSignInOpen && (
+                <div
+                  ref={signInRef}
+                  className='fixed top-0 m-0! left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
+                  <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white px-8 py-14 text-center dark:bg-darklight'>
+                    <button
+                      onClick={() => setIsSignInOpen(false)}
+                      className=' hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8'
+                      aria-label='Close Sign In Modal'>
+                      <Icon
+                        icon='ic:round-close'
+                        className='text-2xl dark:text-white'
+                      />
+                    </button>
+                    <Signin
+                      signInOpen={(value: boolean) => setIsSignInOpen(value)}
+                    />
+                  </div>
+                </div>
+              )}
+              <Link
+                href='#'
+                className='hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'
+                onClick={() => {
+                  setIsSignUpOpen(true)
+                }}>
+                Sign Up
+              </Link>
+              {isSignUpOpen && (
+                <div
+                  ref={signUpRef}
+                  className='fixed top-0 m-0! left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
+                  <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white px-8 py-14 text-center dark:bg-darklight'>
+                    <button
+                      onClick={() => setIsSignUpOpen(false)}
+                      className=' hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8'
+                      aria-label='Close Sign In Modal'>
+                      <Icon
+                        icon='ic:round-close'
+                        className='text-2xl dark:text-white'
+                      />
+                    </button>
+                    <SignUp
+                      signUpOpen={(value: boolean) => setIsSignUpOpen(value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className='hidden lg:flex items-center gap-2'>
+              <span className='px-4 py-2 rounded-lg bg-transparent border border-primary text-primary'>
+                {userName}
+              </span>
+              {isAdmin && (
+                <Link
+                  href='/inbox'
+                  className='bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'>
+                  Inbox
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  setUserName(null)
+                  setUserEmail(null)
+                  handleLogout()
+                }}
+                className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'>
+                Logout
+              </button>
             </div>
           )}
           <button
@@ -216,26 +303,50 @@ const Header: React.FC = () => {
           {headerData.map((item, index) => (
             <MobileHeaderLink key={index} item={item} />
           ))}
-          <div className='mt-4 flex flex-col gap-4 w-full'>
-            <Link
-              href='#'
-              className='bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'
-              onClick={() => {
-                setIsSignInOpen(true)
-                setNavbarOpen(false)
-              }}>
-              Sign In
-            </Link>
-            <Link
-              href='#'
-              className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'
-              onClick={() => {
-                setIsSignUpOpen(true)
-                setNavbarOpen(false)
-              }}>
-              Sign Up
-            </Link>
-          </div>
+          {!userName ? (
+            <div className='mt-4 flex flex-col gap-4 w-full'>
+              <Link
+                href='#'
+                className='bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'
+                onClick={() => {
+                  setIsSignInOpen(true)
+                  setNavbarOpen(false)
+                }}>
+                Sign In
+              </Link>
+              <Link
+                href='#'
+                className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'
+                onClick={() => {
+                  setIsSignUpOpen(true)
+                  setNavbarOpen(false)
+                }}>
+                Sign Up
+              </Link>
+            </div>
+          ) : (
+            <div className='mt-4 flex flex-col gap-3 w-full'>
+              <span className='px-4 py-2 rounded-lg bg-transparent border border-primary text-primary text-center'>
+                {userName}
+              </span>
+              {isAdmin && (
+                <Link
+                  href='/inbox'
+                  className='bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white text-center'>
+                  Inbox
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  setUserName(null)
+                  setUserEmail(null)
+                  handleLogout()
+                }}
+                className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'>
+                Logout
+              </button>
+            </div>
+          )}
         </nav>
       </div>
       {/* Successsful Login Alert */}

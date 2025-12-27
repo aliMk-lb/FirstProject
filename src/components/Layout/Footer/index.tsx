@@ -12,12 +12,11 @@ const Footer: FC = () => {
             <div className='sm:content-normal sm:text-start text-center content-center sm:w-auto w-full'>
               <Link href='/' className='md:block flex justify-center'>
                 <Image
-                  src={getImgPath('/images/logo/logo-white.svg')}
+                  src={getImgPath('/images/logo/logo-white.png')}
                   alt='logo'
-                  width={160}
-                  height={50}
-                  style={{ width: 'auto', height: 'auto' }}
-                  quality={100}
+                  width={105}
+                  height={55}
+                  quality={100}              
                   unoptimized
                 />
               </Link>
@@ -39,17 +38,17 @@ const Footer: FC = () => {
               <div className='pb-5 sm:block flex'>
                 <p className='text-base font-bold text-white'>Phone</p>
                 <Link
-                  href='tel:+(690) 2560 0020'
+                  href='tel:+(961) 71 123 456'
                   className='text-2xl text-white/50 hover:text-white'>
-                  +(690) 2560 0020
+                  +(961) 71 123 456
                 </Link>
               </div>
               <div className='sm:block flex items-center gap-3'>
                 <p className='text-base font-bold text-white'>Email</p>
                 <Link
-                  href='mailto:info@venus.com'
+                  href='mailto:info@info@lb.edu.com'
                   className='text-2xl text-white/50 hover:text-white'>
-                  info@Venus.com
+                  info@lb.edu.com
                 </Link>
               </div>
               <div>
@@ -126,15 +125,15 @@ const Footer: FC = () => {
               <p className='text-MistyBlue text-base pb-7 text-white/50'>
                 To be updated with all the latest trends and product
               </p>
-              <form className='newsletter-form flex rounded-lg sm:w-full w-3/4 sm:mx-0 mx-auto'>
+              <form className='newsletter-form flex flex-col sm:flex-row gap-3 sm:gap-0 rounded-lg w-full sm:w-full max-w-xl sm:mx-0 mx-auto'>
                 <input
                   type='email'
                   placeholder='Email*'
-                  className='p-4 text-base border-transparent rounded-s-lg rounded-e-none! outline-0 focus:border-primary dark:focus:border-primary w-[calc(100%_-_137px)] flex bg-white dark:bg-midnight_text dark:text-white dark:border-solid dark:border dark:border-border_color'
+                  className='p-4 text-base border-transparent rounded-lg sm:rounded-e-none sm:rounded-s-lg outline-0 focus:border-primary dark:focus:border-primary w-full flex-1 bg-white dark:bg-midnight_text dark:text-white dark:border-solid dark:border dark:border-border_color'
                 />
                 <button
                   type='submit'
-                  className='p-[0.625rem] text-base font-medium bg-primary text-white border-none cursor-pointer rounded-e-lg outline-0 text-center w-[8.5625rem] hover:bg-blue-700 hover:shadow-none'>
+                  className='p-[0.625rem] text-base font-medium bg-primary text-white border-none cursor-pointer rounded-lg sm:rounded-e-lg sm:rounded-s-none outline-0 text-center w-full sm:w-[8.5625rem] hover:bg-blue-700 hover:shadow-none'>
                   Subscribe
                 </button>
               </form>

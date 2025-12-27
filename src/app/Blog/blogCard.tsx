@@ -3,12 +3,20 @@ import Image from "next/image";
 import { Blog } from "@/types/blog";
 import { format } from "date-fns";
 import Link from "next/link";
+import { getImgPath } from "@/utils/image";
 
 const BlogCard = ({ blog }: { blog: Blog }) => {
   const { title, coverImage, excerpt, date, slug } = blog;
 
   // Use coverImage or image from MDX, fallback to a default image
-  const imgSrc = coverImage || (blog as any).image || "/images/blog/blog_1.png";
+  const imgSrc = getImgPath(
+    coverImage || (blog as any).image || "/images/blog/blog_1.png"
+  );
+  const parsedDate = date ? new Date(date) : null;
+  const formattedDate =
+    parsedDate && !Number.isNaN(parsedDate.getTime())
+      ? format(parsedDate, "dd MMM yyyy")
+      : null;
 
   return (
     <div className="group mb-0 relative">
@@ -26,10 +34,6 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
         </Link>
       </div>
 
-      <div className="absolute top-0 bg-primary py-2 ml-4 mt-4 px-5 rounded-sm">
-        <span className="text-white font-medium text-sm">Pricing</span>
-      </div>
-
       <div>
         <h3>
           <Link
@@ -39,9 +43,11 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
             {title}
           </Link>
         </h3>
-        <span className="text-sm font-semibold leading-loose text-SereneGray">
-          {format(new Date(date), "dd MMM yyyy")}
-        </span>
+        {formattedDate && (
+          <span className="text-sm font-semibold leading-loose text-SereneGray">
+            {formattedDate}
+          </span>
+        )}
       </div>
     </div>
   );

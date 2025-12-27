@@ -13,10 +13,9 @@ const NotFound = () => {
               <Image
                 src={getImgPath("/images/svgs/404.svg")}
                 alt="image"
-                width={0}
-                height={0}
-                layout="responsive"
-                quality={100}
+                width={500}
+                height={500}
+                style={{ width: '100%', height: 'auto' }}
                 className="mx-auto max-w-full"
               />
             </div>

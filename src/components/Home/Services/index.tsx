@@ -23,7 +23,7 @@ const Services = () => {
           data-aos='fade-up'
           data-aos-delay='200'
           data-aos-duration='1000'>
-          Services specifically designed to meet your business needs
+          Services specifically designed to meet your business needs
         </h2>
         <div className='grid md:grid-cols-12 sm:grid-cols-8 grid-cols-1 gap-7'>
           {Servicebox.map((item, index) => (
@@ -69,3 +69,6 @@ const Services = () => {
 }
 
 export default Services
+
+
+

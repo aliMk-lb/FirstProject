@@ -11,7 +11,11 @@ const Blog: React.FC = () => {
     'excerpt',
     'coverImage',
     'slug',
-  ]).slice(0, 3)
+  ]).sort((a: any, b: any) => {
+    const da = a.date ? new Date(a.date).getTime() : 0
+    const db = b.date ? new Date(b.date).getTime() : 0
+    return db - da
+  })
 
   return (
     <section

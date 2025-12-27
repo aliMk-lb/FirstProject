@@ -1,46 +1,73 @@
 "use client";
-import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import SocialSignIn from "../SocialSignIn";
 import Logo from "@/components/Layout/Header/Logo";
 import Loader from "@/components/Common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import AuthDialogContext from "@/app/context/AuthDialogContext";
+import { API_BASE } from "@/utils/api";
 
 const Signin = ({ signInOpen }: { signInOpen?: any }) => {
-  const { data: session } = useSession();
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin123");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const authDialog = useContext(AuthDialogContext);
 
-  const handleSubmit = async (e: any) => {
-    const notify = () => toast("Here is your toast.");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await signIn("credentials", {
-      redirect: false,
-      username,
-      password,
-    });
-    if (result?.error) {
-      // Handle successful sign-in
-      setError(result.error);
-    }
-    if (result?.status === 200) {
+    setLoading(true);
+    setSuccessMsg("");
+    setErrorMsg("");
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const message = data?.error || "Invalid credentials";
+        throw new Error(message);
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setSuccessMsg("Signed in successfully. Redirecting...");
+      toast.success("Signed in successfully");
+      console.log(data.user);
+
       setTimeout(() => {
-        signInOpen(false);
-      }, 1200);
-      authDialog?.setIsSuccessDialogOpen(true);
-      setTimeout(() => {
-        authDialog?.setIsSuccessDialogOpen(false);
-      }, 1100);
-    } else {
+        if (signInOpen) {
+          signInOpen(false);
+        }
+        authDialog?.setIsSuccessDialogOpen(true);
+        const adminEmail = "admin@gmail.com";
+        const loggedEmail = (data.user?.email || "").trim().toLowerCase();
+        const normalizedAdmin = adminEmail.trim().toLowerCase();
+        if (loggedEmail === normalizedAdmin) {
+          window.open("/inbox", "_blank");
+        } else {
+          window.location.href = "/";
+        }
+      }, 1000);
+    } catch (err: any) {
+      const message = err?.message || "Invalid credentials";
+      setErrorMsg(message);
+      toast.error(message);
       authDialog?.setIsFailedDialogOpen(true);
       setTimeout(() => {
         authDialog?.setIsFailedDialogOpen(false);
       }, 1100);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,14 +87,14 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
         <Toaster />
       </span>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mb-[22px]">
           <input
-            type="text"
-            placeholder="Username"
+            type="email"
+            placeholder="Email"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-md border placeholder:text-gray-400  border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition  focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary"
           />
         </div>
@@ -87,10 +114,15 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
             className="flex w-full cursor-pointer items-center justify-center rounded-md border border-primary bg-primary hover:bg-darkprimary dark:hover:bg-darkprimary! px-5 py-3 text-base text-white transition duration-300 ease-in-out "
           >
             Sign In
-            {/* {loading && <Loader />} */}
+            {loading && <Loader />}
           </button>
         </div>
       </form>
+
+      {successMsg && (
+        <p className="text-green-500 text-sm mb-4">{successMsg}</p>
+      )}
+      {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
 
       <Link
         href="/"

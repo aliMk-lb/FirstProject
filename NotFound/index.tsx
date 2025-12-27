@@ -14,9 +14,7 @@ const NotFound = () => {
                 alt="image"
                 width={500}
                 height={500}
-                layout="responsive"
-                quality={100}
-                style={{width:"100%"}}
+                style={{ width: '100%', height: 'auto' }}
                 className="max-w-full"
               />
             </div>

@@ -1,4 +1,4 @@
-import { ColorConfiguration } from "./ColorConfiguraion";
+import { ColorConfiguration } from "./ColorConfiguration";
 import { LogoConfiguration } from "./LogoConfiguration";
 import { TypographyConfiguration } from "./TypographyConfiguration";
 

@@ -18,7 +18,7 @@ export const count = [
     {
         icon: getImgPath("/images/counter/admin.svg"),
         value: "364",
-        description: "Client testimonials received in the year 2021",
+        description: "Client testimonials received in the year 2024",
     },
     {
         icon: getImgPath("/images/counter/bag.svg"),
@@ -129,7 +129,7 @@ export const portfolioinfo = [
         alt: 'Portfolio',
         title: 'Apex Strategies',
         slug: 'apex-strategies',
-        info: 'DesignaA modern and engaging visual interfacetion',
+        info: 'A modern and engaging visual interface',
         Class: 'md:mt-0'
     },
     
