@@ -1,8 +1,3 @@
--- CSCI426 Phase 2 - Database Schema
--- Run this in phpMyAdmin (XAMPP) or MySQL client
-
-CREATE DATABASE IF NOT EXISTS csci426;
-USE csci426;
 
 -- Users table (for signup/login)
 CREATE TABLE IF NOT EXISTS users (

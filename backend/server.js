@@ -22,7 +22,15 @@ const pool = createPool({
   queueLimit: 0,
 })
 
-app.use(cors({ origin: true, credentials: true }))
+// CORS configuration - restrict to frontend origin in production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || 'https://ali-website.vercel.app'
+    : true,
+  credentials: true
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 
 const authenticate = (req, res, next) => {
