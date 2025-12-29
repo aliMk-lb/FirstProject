@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { useContext, useState } from "react";
 import SocialSignIn from "../SocialSignIn";
@@ -23,49 +24,70 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
     setErrorMsg("");
 
     try {
-      const response = await fetch(`${API_BASE}/auth/login`, {
+      console.log("API_BASE =", API_BASE);
+
+      const url = `${API_BASE}/auth/login`;
+      console.log("LOGIN URL =", url);
+
+      const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      console.log("LOGIN STATUS =", response.status);
 
-      if (!response.ok) {
-        const message = data?.error || "Invalid credentials";
-        throw new Error(message);
+      // Try to parse JSON safely
+      let data: any = null;
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
       }
 
+      if (!response.ok) {
+        const msg =
+          data?.error ||
+          data?.message ||
+          `Login failed (status ${response.status})`;
+        throw new Error(msg);
+      }
+
+      // ✅ store JWT + user
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
       setSuccessMsg("Signed in successfully. Redirecting...");
       toast.success("Signed in successfully");
-      console.log(data.user);
 
       setTimeout(() => {
-        if (signInOpen) {
-          signInOpen(false);
-        }
+        if (signInOpen) signInOpen(false);
+
         authDialog?.setIsSuccessDialogOpen(true);
+
         const adminEmail = "admin@gmail.com";
-        const loggedEmail = (data.user?.email || "").trim().toLowerCase();
-        const normalizedAdmin = adminEmail.trim().toLowerCase();
-        if (loggedEmail === normalizedAdmin) {
-          window.open("/inbox", "_blank");
+        const loggedEmail = (data.user?.email || "").toLowerCase().trim();
+
+        if (loggedEmail === adminEmail) {
+          window.location.href = "/inbox";
         } else {
           window.location.href = "/";
         }
       }, 1000);
     } catch (err: any) {
-      const message = err?.message || "Invalid credentials";
+      const message =
+        err?.message ||
+        "Failed to fetch (CORS / wrong API url / backend down)";
       setErrorMsg(message);
       toast.error(message);
+
       authDialog?.setIsFailedDialogOpen(true);
       setTimeout(() => {
         authDialog?.setIsFailedDialogOpen(false);
       }, 1100);
+
+      console.error("LOGIN ERROR:", err);
     } finally {
       setLoading(false);
     }
@@ -79,9 +101,9 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
 
       <SocialSignIn />
 
-      <span className="z-1 relative my-8 block text-center">
-        <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-border dark:bg-dark_border"></span>
-        <span className="text-body-secondary relative z-10 inline-block bg-white px-3 text-base dark:bg-darklight">
+      <span className="relative my-8 block text-center">
+        <span className="absolute left-0 top-1/2 block h-px w-full bg-border dark:bg-dark_border"></span>
+        <span className="relative inline-block px-4 py-1 text-xs font-semibold rounded-full border border-border dark:border-dark_border bg-[#071333] text-white">
           OR
         </span>
         <Toaster />
@@ -95,23 +117,25 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border placeholder:text-gray-400  border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition  focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary"
+            className="w-full rounded-md border px-5 py-3"
           />
         </div>
+
         <div className="mb-[22px]">
           <input
             type="password"
+            placeholder="Password"
             required
             value={password}
-            placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition  focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary"
+            className="w-full rounded-md border px-5 py-3"
           />
         </div>
+
         <div className="mb-9">
           <button
             type="submit"
-            className="flex w-full cursor-pointer items-center justify-center rounded-md border border-primary bg-primary hover:bg-darkprimary dark:hover:bg-darkprimary! px-5 py-3 text-base text-white transition duration-300 ease-in-out "
+            className="flex w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-white"
           >
             Sign In
             {loading && <Loader />}
@@ -119,23 +143,12 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
         </div>
       </form>
 
-      {successMsg && (
-        <p className="text-green-500 text-sm mb-4">{successMsg}</p>
-      )}
-      {errorMsg && <p className="text-red-500 text-sm mb-4">{errorMsg}</p>}
+      {successMsg && <p className="text-green-500">{successMsg}</p>}
+      {errorMsg && <p className="text-red-500">{errorMsg}</p>}
 
-      <Link
-        href="/"
-        className="mb-2 inline-block text-base text-dark hover:text-primary dark:text-white dark:hover:text-primary"
-      >
+      <Link href="/" className="block mt-4">
         Forget Password?
       </Link>
-      <p className="text-body-secondary text-base">
-        Not a member yet?{" "}
-        <Link href="/" className="text-primary hover:underline">
-          Sign Up
-        </Link>
-      </p>
     </>
   );
 };
