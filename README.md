@@ -118,4 +118,4 @@ NODE_ENV=development
 - UI/UX improvements and richer admin inbox features
 
 ## License
-MIT
+© All rights reserved. Made by GetNextJs Templates • Distributed by ThemeWagon edited by Ali Al Rida Al Mokdad
