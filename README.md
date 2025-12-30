@@ -96,18 +96,15 @@ NODE_ENV=development
 | NODE_ENV | Backend | Environment mode (development/production) |
 
 ## API Endpoints
-- `POST /auth/signup` — register a new user
-- `POST /auth/login` — authenticate and receive JWT
-- `POST /api/messages` — submit contact form
-- `GET /api/messages` — fetch messages (admin)
-- `PATCH /api/messages/:id` — update message status (admin)
-- `DELETE /api/messages/:id` — delete message (admin)
+- `POST /auth/signup` â€” register a new user
+- `POST /auth/login` â€” authenticate and receive JWT
+- `POST /api/messages` â€” submit contact form
+- `GET /api/messages` â€” fetch messages (admin)
+- `PATCH /api/messages/:id` â€” update message status (admin)
+- `DELETE /api/messages/:id` â€” delete message (admin)
 
 ## Admin Access
 - Default admin email: `admin@gmail.com` (set in backend `.env`). Assign this user the admin role in the database.
-
-## Screenshots
-Screenshots will be included in the accompanying report PDF.
 
 ## Challenges & Learnings
 - Managing CORS between frontend (Vercel) and backend (Render)
