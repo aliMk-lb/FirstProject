@@ -95,14 +95,20 @@ const allowedOrigins = [
   FRONTEND_URL,
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://ali-website.vercel.app',
-  ...additionalAllowedOrigins,
+  'https://first-project-murex-sigma.vercel.app',
+  'https://firstproject-b4zd.onrender.com',
 ]
 
+const additionalAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean)
+
 const isAllowedOrigin = (origin) => {
-  if (!origin) return true // server-to-server / curl / health
+  if (!origin) return true // server-to-server / health
   if (allowedOrigins.includes(origin)) return true
-  if (origin.endsWith('.vercel.app')) return true // allow vercel preview/frontends
+  if (additionalAllowedOrigins.includes(origin)) return true
+  if (origin.endsWith('.vercel.app')) return true // allow Vercel previews/frontends
   return false
 }
 
@@ -111,10 +117,13 @@ app.use(
     origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
+    optionsSuccessStatus: 200,
   })
 )
 app.options('*', cors())
 app.use(express.json())
+app.set('trust proxy', 1)
 
 // === Helpers ===
 const authMiddleware = (req, res, next) => {
