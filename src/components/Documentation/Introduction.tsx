@@ -69,6 +69,8 @@ export const Introduction = () => {
                   <Image
                     src={item.img}
                     alt="npm-package"
+                    width={40}
+                    height={40}
                     className=" mx-auto w-10 h-10 "
                   />
                   <h5 className="text-2xl font-bold mt-3.5 dark:text-white">{`v${item.version}`}</h5>
