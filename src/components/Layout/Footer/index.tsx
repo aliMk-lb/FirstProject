@@ -186,7 +186,8 @@ const Footer: FC = () => {
               target='_blank'
               className='hover:text-primary'>
               {' '}ThemeWagon
-            </Link>
+            </Link>{' '}
+            edited by Ali Al Rida Al Mokdad
           </p>
         </div>
       </div>
