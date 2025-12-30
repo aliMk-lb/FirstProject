@@ -86,21 +86,29 @@ const pool = mysql.createPool({
 })
 
 // === Middleware ===
+const additionalAllowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean)
+
 const allowedOrigins = [
   FRONTEND_URL,
   'http://localhost:3000',
   'http://localhost:3001',
   'https://ali-website.vercel.app',
+  ...additionalAllowedOrigins,
 ]
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true // server-to-server / curl / health
+  if (allowedOrigins.includes(origin)) return true
+  if (origin.endsWith('.vercel.app')) return true // allow vercel preview/frontends
+  return false
+}
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true) // server-to-server / curl / health
-      if (allowedOrigins.includes(origin)) return callback(null, true)
-      // do not crash on disallowed origins (Render friendliness)
-      return callback(null, false)
-    },
+    origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
