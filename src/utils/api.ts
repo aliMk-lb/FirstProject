@@ -1,6 +1,6 @@
 const defaultApiBase =
   process.env.NODE_ENV === "production"
-    ? "https://first-project-murex-sigma.vercel.app"
+    ? "https://firstproject-b4zd.onrender.com"
     : "http://localhost:4000";
 
 export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || defaultApiBase).replace(/\/$/, "");
