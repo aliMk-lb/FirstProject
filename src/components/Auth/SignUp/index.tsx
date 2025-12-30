@@ -25,7 +25,9 @@ const SignUp = ({signUpOpen}:{signUpOpen?:any}) => {
     setErrorMsg("");
 
     try {
-      const response = await fetch(`${API_BASE}/auth/signup`, {
+      const url = `${API_BASE}/auth/signup`;
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,10 +35,21 @@ const SignUp = ({signUpOpen}:{signUpOpen?:any}) => {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await response.json();
+      // Parse response safely to avoid crashing on HTML/errors
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (_err) {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data?.error || "Signup failed");
+        const message =
+          data?.error ||
+          data?.message ||
+          `Signup failed (status ${response.status})`;
+        throw new Error(message);
       }
 
       setSuccessMsg("Successfully registered. Redirecting to Sign In...");
@@ -49,7 +62,9 @@ const SignUp = ({signUpOpen}:{signUpOpen?:any}) => {
         router.push("/");
       }, 1500);
     } catch (err: any) {
-      const message = err?.message || "Signup failed";
+      const message =
+        err?.message ||
+        "Failed to fetch (CORS / wrong API url / backend down)";
       setErrorMsg(message);
       toast.error(message);
     } finally {
