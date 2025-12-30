@@ -1,65 +1,27 @@
-import { notFound } from "next/navigation";
-import { getPostBySlug, getAllPosts } from "@/utils/markdown";
-import markdownToHtml from "@/utils/markdownToHtml";
-import { format } from "date-fns";
-import Image from "next/image";
-import { getImgPath } from "@/utils/image";
+"use client";
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
+import Link from "next/link";
 
-export async function generateStaticParams() {
-  const posts = getAllPosts(["slug"]);
-  return posts.map((p: any) => ({ slug: p.slug }));
-}
+type Params = { slug: string };
 
-export default async function PostPage({ params: paramsPromise }: Props) {
-  const params = await paramsPromise;
-  const post = getPostBySlug(params.slug);
-
-  if (!post) return notFound();
-
-  const contentHtml = await markdownToHtml(post.content);
-
-  const frontmatter = post.frontmatter || {};
-  const formattedDate =
-    frontmatter.date && !Number.isNaN(new Date(frontmatter.date).getTime())
-      ? format(new Date(frontmatter.date), "dd MMM yyyy")
-      : null;
+export default function BlogPostPage({ params }: { params: Params }) {
+  const { slug } = params;
 
   return (
-    <main className="bg-section dark:bg-darkmode">
-      <section className="container mx-auto max-w-6xl px-4 md:pt-40 pt-28 pb-16">
-        <header className="flex flex-col gap-4 md:gap-3">
-          {formattedDate && (
-            <span className="text-base text-grey dark:text-white/70">
-              {formattedDate}
-            </span>
-          )}
-          <h1 className="text-3xl md:text-[40px] leading-tight font-bold text-midnight_text dark:text-white">
-            {frontmatter.title}
-          </h1>
-        </header>
-
-        {frontmatter.coverImage && (
-          <div className="mt-8 mb-10 overflow-hidden rounded-lg shadow-service">
-            <Image
-              src={getImgPath(frontmatter.coverImage)}
-              alt={frontmatter.title || "Blog cover"}
-              width={1200}
-              height={675}
-              quality={100}
-              style={{ width: "100%", height: "auto" }}
-            />
-          </div>
-        )}
-
-        <article
-          className="blog-details text-midnight_text dark:text-white"
-          dangerouslySetInnerHTML={{ __html: contentHtml }}
-        />
-      </section>
+    <main className="min-h-screen bg-white dark:bg-darkmode text-midnight_text dark:text-white px-4 py-16">
+      <div className="max-w-3xl mx-auto space-y-6 text-center">
+        <h1 className="text-3xl font-bold">Blog post coming soon</h1>
+        <p className="text-lg text-grey dark:text-white/70">
+          We couldn't find content for "{slug}". Please check back later or
+          return to the blog list.
+        </p>
+        <Link
+          href="/Blog"
+          className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/80"
+        >
+          Back to Blog
+        </Link>
+      </div>
     </main>
   );
 }
